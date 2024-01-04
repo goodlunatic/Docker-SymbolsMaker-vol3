@@ -5,4 +5,4 @@
 
 如：linux-image-unsigned-5.4.0-100-generic-dbgsym_5.4.0-100.113_amd64.ddeb
 
-本项目的详细使用方法可以参考 [作者的博客](https://goodlunatic.github.io/)中 Misc——Forensic 这篇文章
+本项目的详细使用方法可以参考 [作者的博客](https://goodlunatic.github.io/) 中 Misc——Forensic 这篇文章
