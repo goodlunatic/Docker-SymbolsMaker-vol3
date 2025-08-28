@@ -1,0 +1,20 @@
+# 因为debian10.2中科大源停止维护了，所以改用debian11.2
+FROM debian:11.2
+
+# 将环境设置为非交互环境
+ENV DEBIAN_FRONTEND=noninteractive
+
+COPY ./src/ /src/
+
+RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list \
+    && sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list \
+	&& apt update --no-install-recommends\
+    && apt install -y gcc dwarfdump build-essential unzip linux-kbuild-5.10 linux-compiler-gcc-10-x86
+    
+WORKDIR /src
+
+RUN dpkg -i linux-image-5.10.0-21-amd64-dbg_5.10.162-1_amd64.deb  \
+    && chmod +x dwarf2json \
+    # 下面这里的文件名需要根据系统版本进行修改，具体文件名可以通过解压上面的ddeb包得到
+    && ./dwarf2json linux --elf /usr/lib/debug/boot/vmlinux-5.10.0-21-amd64 > Debian_5.10.0-21-amd64.json \
+    && mv Debian_5.10.0-21-amd64.json /tmp

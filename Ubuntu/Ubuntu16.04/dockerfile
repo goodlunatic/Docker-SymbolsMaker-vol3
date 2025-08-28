@@ -1,0 +1,19 @@
+FROM ubuntu:16.04
+
+# 将环境设置为非交互环境
+ENV DEBIAN_FRONTEND=noninteractive
+
+COPY ./src/ /src/
+
+RUN sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list \
+    && sed -i 's/security.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list \
+	&& apt update --no-install-recommends\
+    && apt install -y gcc dwarfdump build-essential unzip libssl1.0.0
+
+WORKDIR /src
+
+RUN dpkg -i linux-image-4.13.0-36-generic-dbgsym_4.13.0-36.40~16.04.1_amd64.ddeb \
+    && chmod +x dwarf2json \
+    # 下面这里的文件名需要根据系统版本进行修改，具体文件名可以通过解压上面的ddeb包得到
+    && ./dwarf2json linux --elf /usr/lib/debug/boot/vmlinux-4.13.0-36-generic > Ubuntu_4.13.0-36_4.13.0-36.40.json \
+    && mv linux-image-4.13.0-36-generic.json /tmp
