@@ -1,0 +1,24 @@
+FROM centos:7
+
+COPY ./src/ /src/
+
+WORKDIR /src
+
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*.repo \
+    && sed -i 's|#baseurl=http://mirror.centos.org/centos|baseurl=https://mirrors.aliyun.com/centos|g' /etc/yum.repos.d/CentOS-*.repo \
+    && sed -i 's|baseurl=http://mirror.centos.org/centos|baseurl=https://mirrors.aliyun.com/centos|g' /etc/yum.repos.d/CentOS-*.repo \
+    && yum clean all \
+    && yum makecache 
+
+RUN yum install -y gcc make unzip elfutils-libelf-devel
+
+    # 需要根据实际的内核版本修改此处
+RUN yum localinstall -y kernel-debuginfo-common-x86_64-3.10.0-1160.el7.x86_64.rpm \
+    && yum localinstall -y kernel-debuginfo-3.10.0-1160.el7.x86_64.rpm
+
+RUN chmod +x dwarf2json \
+    && ./dwarf2json linux --elf /usr/lib/debug/usr/lib/modules/3.10.0-1160.el7.x86_64/vmlinux > Centos_3.10.0-1160.el7.x86_64.json \
+    && mv Centos_3.10.0-1160.el7.x86_64.json /tmp
+
+# 清理 yum 缓存以减小镜像体积
+RUN yum clean all
